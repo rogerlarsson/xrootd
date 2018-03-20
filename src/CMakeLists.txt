@@ -19,7 +19,10 @@ include( XrdClient )
 
 if( ENABLE_XRDCL )
   add_subdirectory( XrdCl )
+  add_subdirectory( api_test )
 endif()
+
+add_subdirectory( XrdTls )
 
 include( XrdServer )
 include( XrdDaemons )

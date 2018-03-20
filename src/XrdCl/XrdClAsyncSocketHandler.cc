@@ -771,12 +771,20 @@ namespace XrdCl
     if( st.code != suDone )
       return;
 
+    HandleHandShake();
+  }
+
+  //------------------------------------------------------------------------
+  // Handle the handshake message
+  //------------------------------------------------------------------------
+  void AsyncSocketHandler::HandleHandShake()
+  {
     //--------------------------------------------------------------------------
     // OK, we have a new message, let's deal with it;
     //--------------------------------------------------------------------------
     pHandShakeData->in = pHSIncoming;
     pHSIncoming = 0;
-    st = pTransport->HandShake( pHandShakeData, *pChannelData );
+    Status st = pTransport->HandShake( pHandShakeData, *pChannelData );
 
     //--------------------------------------------------------------------------
     // Deal with wait responses

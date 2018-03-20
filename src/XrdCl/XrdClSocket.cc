@@ -601,4 +601,22 @@ namespace XrdCl
     pName += ">";
     return pName;
   }
+
+
+  //----------------------------------------------------------------------------
+  // Read helper from raw socket helper
+  //----------------------------------------------------------------------------
+  Status ReadFrom( int sfd, char *buffer, size_t size, int &bytesRead )
+  {
+    int status = ::read( sfd, buffer, size );
+
+    if( status < 0 && (errno == EAGAIN || errno == EWOULDBLOCK) )
+      return Status( stOK, suRetry );
+
+    if( status <= 0 )
+      return Status( stError, errSocketError, errno );
+
+    bytesRead = status;
+    return Status();
+  }
 }
