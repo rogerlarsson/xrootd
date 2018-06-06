@@ -46,6 +46,7 @@ class XrdOss;
 class XrdOssDF;
 class XrdOssDir;
 class XrdOucEnv;
+class XrdOucPListAnchor;
 class XrdSysError;
 class XrdSysLogger;
 class XrdOucStream;
@@ -180,6 +181,7 @@ class XrdCks;
 class XrdCmsClient;
 class XrdOfsConfigPI;
 class XrdOfsPoscq;
+class XrdSfsFACtl;
   
 class XrdOfs : public XrdSfsFileSystem
 {
@@ -352,6 +354,9 @@ static  int   Emsg(const char *, XrdOucErrInfo  &, int, const char *x,
                    XrdOfsHandle *hP);
 static  int   Emsg(const char *, XrdOucErrInfo  &, int, const char *x,
                    const char *y="");
+        int   ctlFAttr(XrdSfsFACtl            &faCtl,
+                       XrdOucErrInfo          &einfo,
+                       const XrdSecEntity     *client);
 static  int   fsError(XrdOucErrInfo &myError, int rc);
 const char   *Split(const char *Args, const char **Opq, char *Path, int Plen);
         int   Stall(XrdOucErrInfo  &, int, const char *);
@@ -368,6 +373,7 @@ char             *myRole;
 XrdAccAuthorize  *Authorization;  //    ->Authorization   Service
 XrdCmsClient     *Balancer;       //    ->Cluster Local   Interface
 XrdOfsEvs        *evsObject;      //    ->Event Notifier
+XrdOucPListAnchor*ossRPList;      //    ->Oss exoprt list
 
 XrdOfsPoscq      *poscQ;          //    -> poscQ if  persist on close enabled
 char             *poscLog;        //    -> Directory for posc recovery log
@@ -384,6 +390,9 @@ char              myRType[4];     // Role type for consistency with the cms
 
 XrdVersionInfo   *myVersion;      // Version number compiled against
 
+int               usxMaxNsz;      // Maximum length of attribute name
+int               usxMaxVsz;      // Maximum length of attribute value
+
 static XrdOfsHandle     *dummyHandle;
 XrdSysMutex              ocMutex; // Global mutex for open/close
 
@@ -391,11 +400,17 @@ XrdSysMutex              ocMutex; // Global mutex for open/close
 /*                            O t h e r   D a t a                             */
 /******************************************************************************/
 
+// Internal file attribute methods
+//
+int ctlFADel(XrdSfsFACtl &faCtl, XrdOucEnv &faEnv, XrdOucErrInfo &einfo);
+int ctlFAGet(XrdSfsFACtl &faCtl, XrdOucEnv &faEnv, XrdOucErrInfo &einfo);
+int ctlFALst(XrdSfsFACtl &faCtl, XrdOucEnv &faEnv, XrdOucErrInfo &einfo);
+int ctlFASet(XrdSfsFACtl &faCtl, XrdOucEnv &faEnv, XrdOucErrInfo &einfo);
+
 // Common functions
 //
-        int   remove(const char type, const char *path,
-                     XrdOucErrInfo &out_error, const XrdSecEntity     *client,
-                     const char *opaque);
+int   remove(const char type, const char *path, XrdOucErrInfo &out_error,
+             const XrdSecEntity *client, const char *opaque);
 
 // Function used during Configuration
 //
@@ -419,5 +434,6 @@ int           xrole(XrdOucStream &, XrdSysError &);
 int           xtpc(XrdOucStream &, XrdSysError &);
 int           xtpcal(XrdOucStream &, XrdSysError &);
 int           xtrace(XrdOucStream &, XrdSysError &);
+int           xatr(XrdOucStream &, XrdSysError &);
 };
 #endif
