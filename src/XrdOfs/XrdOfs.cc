@@ -164,6 +164,7 @@ XrdOfs::XrdOfs()
 //
    Cks       = 0;
    CksPfn    = true;
+   CksRdr    = true;
 
 // Eextended attribute limits
 //
@@ -1368,7 +1369,7 @@ int XrdOfs::chksum(      csFunc            Func,   // In
 
 // If we are a menager then we need to redirect the client to where the file is
 //
-   if (Finder && Finder->isRemote() 
+   if (CksRdr && Finder && Finder->isRemote() 
    &&  (rc = Finder->Locate(einfo, Path, SFS_O_RDONLY, &cksEnv)))
       return fsError(einfo, rc);
 
