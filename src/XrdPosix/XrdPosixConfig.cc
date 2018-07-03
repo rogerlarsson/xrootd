@@ -42,6 +42,7 @@
 #include "XrdPosix/XrdPosixCacheBC.hh"
 #include "XrdPosix/XrdPosixConfig.hh"
 #include "XrdPosix/XrdPosixFileRH.hh"
+#include "XrdPosix/XrdPosixInfo.hh"
 #include "XrdPosix/XrdPosixMap.hh"
 #include "XrdPosix/XrdPosixPrepIO.hh"
 #include "XrdPosix/XrdPosixTrace.hh"
@@ -208,6 +209,29 @@ void XrdPosixConfig::initEnv(XrdOucEnv &theEnv, const char *vName, long long &De
            Dest = -1;
           }
       }
+}
+  
+/******************************************************************************/
+/*                                O p e n F C                                 */
+/******************************************************************************/
+
+bool XrdPosixConfig::OpenFC(const char *path, int oflag, mode_t mode,
+                            XrdPosixInfo &Info)
+{
+   int rc = XrdPosixXrootd::Open(path, oflag, mode, Info.cbP, &Info);
+
+// Check if we actually can open the file directly via the cache
+//
+   if (rc == -3)
+      {if (*Info.cachePath && errno == 0 && Info.ffReady) return true;
+       rc = -1;
+       if (!errno) errno = ENOPROTOOPT;
+      }
+
+// Return actual result
+//
+   Info.fileFD = rc;
+   return false;
 }
   
 /******************************************************************************/
