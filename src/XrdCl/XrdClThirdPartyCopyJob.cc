@@ -33,6 +33,7 @@
 #include "XrdCl/XrdClUglyHacks.hh"
 #include "XrdCl/XrdClRedirectorRegistry.hh"
 #include "XrdOuc/XrdOucTPC.hh"
+#include "XrdOuc/XrdOucEnv.hh"
 #include "XrdSys/XrdSysTimer.hh"
 
 #include <iostream>
@@ -135,7 +136,7 @@ namespace XrdCl
     std::string checkSumType;
     std::string checkSumPreset;
     uint64_t    sourceSize;
-    bool        force, coerce;
+    bool        force, coerce, delegate;
 
     pProperties->Get( "checkSumMode",    checkSumMode );
     pProperties->Get( "checkSumType",    checkSumType );
@@ -143,6 +144,22 @@ namespace XrdCl
     pProperties->Get( "sourceSize",      sourceSize );
     pProperties->Get( "force",           force );
     pProperties->Get( "coerce",          coerce );
+    pProperties->Get( "delegate",        delegate );
+
+    if( delegate )
+    {
+      XrdOucEnv env;
+      env.Export( "XrdSecGSIDELEGPROXY", 1 );
+    }
+    else
+    {
+      XrdOucEnv env;
+      env.Export( "XrdSecGSIDELEGPROXY", 0 );
+    }
+
+    int nbStrm = 0;
+    XrdCl::Env *env = XrdCl::DefaultEnv::GetEnv();
+    env->GetInt( "SubStreamsPerChannel", nbStrm );
 
     //--------------------------------------------------------------------------
     // Generate the destination CGI
@@ -158,7 +175,7 @@ namespace XrdCl
     const char  *cgiP = XrdOucTPC::cgiC2Dst( tpcKey.c_str(),
                                              tpcSource.GetHostId().c_str(),
                                              tpcSource.GetPath().c_str(),
-                                             0, cgiBuff, 2048 );
+                                             0, cgiBuff, 2048, nbStrm );
     if( *cgiP == '!' )
     {
       log->Error( UtilityMsg, "Unable to setup target url: %s", cgiP+1 );
