@@ -121,8 +121,6 @@ static void          DelayedDestroy(XrdPosixFile *fp);
        void          ReadV (XrdOucCacheIOCB &iocb, const XrdOucIOVec *readV,
                             int n);
 
-       void          setFFChk(int val) {ffInCache = val;}
-
        long long     setOffset(long long offs)
                               {updMutex.Lock();
                                currOffset = offs;
@@ -192,7 +190,6 @@ char       *fPath;
 char       *fOpen;
 char       *fLoc;
 union {int  cOpt; int numTries;};
-int         ffInCache;
 char        isStream;
 };
 #endif
