@@ -1610,7 +1610,7 @@ XRootDStatus DoXAttr( FileSystem                      *fs,
         return XRootDStatus( stError, errInvalidArgs );
       }
 
-      std::vector<std::string> *result = 0;
+      std::vector<XAttr> *result = 0;
       XRootDStatus status = fs->ListXAttr( path, result );
 
       if( !status.IsOK() )
@@ -1621,7 +1621,7 @@ XRootDStatus DoXAttr( FileSystem                      *fs,
         std::cout << "# file: " << path << '\n';
         auto itr = result->begin();
         for( ; itr != result->end(); ++itr )
-          std::cout << *itr << '\n';
+          std::cout << itr->name << "=\"" << itr->value << "\"\n";
         delete result;
       }
 

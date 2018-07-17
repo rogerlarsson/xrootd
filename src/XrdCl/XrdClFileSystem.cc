@@ -1669,7 +1669,7 @@ namespace XrdCl
     if( pPlugIn )
       return XRootDStatus( stError, errNotSupported );
 
-    return XAttrOperationImpl( kXR_fattrSet, path, attrs, handler, timeout );
+    return XAttrOperationImpl( kXR_fattrSet, 0, path, attrs, handler, timeout );
   }
 
   //------------------------------------------------------------------------
@@ -1699,7 +1699,7 @@ namespace XrdCl
     if( pPlugIn )
       return XRootDStatus( stError, errNotSupported );
 
-    return XAttrOperationImpl( kXR_fattrGet, path, attrs, handler, timeout );
+    return XAttrOperationImpl( kXR_fattrGet, 0, path, attrs, handler, timeout );
   }
 
   //------------------------------------------------------------------------
@@ -1729,7 +1729,7 @@ namespace XrdCl
     if( pPlugIn )
       return XRootDStatus( stError, errNotSupported );
 
-    return XAttrOperationImpl( kXR_fattrDel, path, attrs, handler, timeout );
+    return XAttrOperationImpl( kXR_fattrDel, 0, path, attrs, handler, timeout );
   }
 
   //------------------------------------------------------------------------
@@ -1759,15 +1759,16 @@ namespace XrdCl
       return XRootDStatus( stError, errNotSupported );
 
     static const std::vector<std::string> nothing;
-    return XAttrOperationImpl( kXR_fattrList, path, nothing, handler, timeout );
+    return XAttrOperationImpl( kXR_fattrList,  ClientFattrRequest::aData,
+                               path, nothing, handler, timeout );
   }
 
   //------------------------------------------------------------------------
   // List extended attributes - sync
   //------------------------------------------------------------------------
-  XRootDStatus FileSystem::ListXAttr( const std::string           &path,
-                                      std::vector<std::string>  *&result,
-                                      uint16_t                    timeout )
+  XRootDStatus FileSystem::ListXAttr( const std::string    &path,
+                                      std::vector<XAttr>  *&result,
+                                      uint16_t              timeout )
   {
     SyncResponseHandler handler;
     Status st = ListXAttr( path, &handler, timeout );
@@ -1858,6 +1859,7 @@ namespace XrdCl
   //------------------------------------------------------------------------
   template<typename T>
   Status FileSystem::XAttrOperationImpl( kXR_char               subcode,
+                                         kXR_char               options,
                                          const std::string     &path,
                                          const std::vector<T>  &attrs,
                                          ResponseHandler       *handler,
@@ -1869,6 +1871,7 @@ namespace XrdCl
 
     req->requestid = kXR_fattr;
     req->subcode   = subcode;
+    req->options   = options;
     req->numattr   = attrs.size();
     memset( req->fhandle, 0, 4 );
     XRootDStatus st = MessageUtils::CreateXAttrBody( msg, attrs, path );
