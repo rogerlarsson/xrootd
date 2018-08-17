@@ -56,6 +56,12 @@ add_library(
   XrdSys/XrdSysXAttr.cc         XrdSys/XrdSysXAttr.hh
 
   #-----------------------------------------------------------------------------
+  # XrdTls
+  #-----------------------------------------------------------------------------
+  XrdTls/XrdTlsConnection.cc    XrdTls/XrdTlsConnection.hh
+  XrdTls/XrdTlsContext.cc       XrdTls/XrdTlsContext.hh
+
+  #-----------------------------------------------------------------------------
   # XrdOuc
   #-----------------------------------------------------------------------------
   XrdOuc/XrdOuca2x.cc           XrdOuc/XrdOuca2x.hh
@@ -198,6 +204,7 @@ target_link_libraries(
   XrdUtils
   pthread
   dl
+  ssl
   ${SOCKET_LIBRARY}
   ${SENDFILE_LIBRARY}
   ${EXTRA_LIBS} )
