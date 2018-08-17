@@ -77,7 +77,6 @@ target_link_libraries(
   XrdCl
   XrdXml
   XrdUtils
-  XrdTls
   pthread
   dl
   ssl)
